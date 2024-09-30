@@ -7,7 +7,7 @@ mutation CreateMovie(
   $description: String
   $imageUrl: String!
   $tags: [String!] = []
-) @auth(level: USER_EMAIL_VERIFIED) {
+) @auth(expr: "auth.token.isAdmin == true") {
   movie_insert(
     data: {
       title: $title
@@ -48,6 +48,25 @@ mutation AddReview(
   $reviewText: String!
 ) @auth(level: USER) {
   review_upsert(
+    data: {
+      userId_expr: "auth.uid"
+      movieId: $movieId
+      rating: $rating
+      reviewText: $reviewText
+      reviewDate_date: { today: true }
+    }
+  )
+}
+
+# Update a user's review for a movie
+# (This is just an example on how to do updates with compound keys; it's not used in the app.)
+mutation UpdateReview(
+  $movieId: UUID!
+  $rating: Int!
+  $reviewText: String!
+) @auth(level: USER) {
+  review_update(
+    key: {movieId: $movieId, userId_expr: "auth.uid"},
     data: {
       userId_expr: "auth.uid"
       movieId: $movieId
