@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from "firebase/app";
-import { connectAuthEmulator, getAuth } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import {
   connectDataConnectEmulator,
   getDataConnect,
@@ -23,8 +23,12 @@ const auth = getAuth(firebaseApp);
 const dataconnect = getDataConnect(firebaseApp, connectorConfig);
 
 if (process.env.NODE_ENV === "development") {
-  connectDataConnectEmulator(dataconnect, "127.0.0.1", 9399, false);
-  connectAuthEmulator(auth, "http://localhost:9099");
+  connectDataConnectEmulator(
+    dataconnect, 
+    window.location.hostname,
+    undefined,
+    true
+  );
 }
 
 const AuthContext = createContext(auth);
