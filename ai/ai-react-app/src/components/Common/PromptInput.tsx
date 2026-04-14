@@ -6,7 +6,6 @@ import {
   CountTokensResponse,
   Part,
   getGenerativeModel,
-  ImagenModelParams,
 } from "firebase/ai";
 import { fileToGenerativePart } from "../../utils/fileUtils";
 import { AppMode } from "../../App";
@@ -23,7 +22,6 @@ interface PromptInputProps {
   activeMode: AppMode;
   aiInstance: AI;
   currentParams?: ModelParams;
-  currentImagenParams?: ImagenModelParams;
   selectedFile: File | null;
 }
 

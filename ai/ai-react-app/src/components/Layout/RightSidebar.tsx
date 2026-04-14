@@ -3,19 +3,17 @@ import { AppMode } from "../../App";
 import styles from "./RightSidebar.module.css";
 import {
   AVAILABLE_GENERATIVE_MODELS,
-  AVAILABLE_IMAGEN_MODELS,
+  AVAILABLE_NANO_BANANA_MODELS,
   defaultFunctionCallingTool,
   defaultGoogleSearchTool,
 } from "../../services/firebaseAIService";
 import {
   ModelParams,
-  ImagenModelParams,
   HarmCategory,
   HarmBlockThreshold,
   FunctionCallingMode,
-  ImagenSafetyFilterLevel,
-  ImagenPersonFilterLevel,
   UsageMetadata,
+  ResponseModality,
 } from "firebase/ai";
 
 interface RightSidebarProps {
@@ -23,8 +21,8 @@ interface RightSidebarProps {
   activeMode: AppMode;
   generativeParams: ModelParams;
   setGenerativeParams: React.Dispatch<React.SetStateAction<ModelParams>>;
-  imagenParams: ImagenModelParams;
-  setImagenParams: React.Dispatch<React.SetStateAction<ImagenModelParams>>;
+  nanoBananaParams: ModelParams;
+  setNanoBananaParams: React.Dispatch<React.SetStateAction<ModelParams>>;
 }
 
 const RightSidebar: React.FC<RightSidebarProps> = ({
@@ -32,8 +30,8 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   activeMode,
   generativeParams,
   setGenerativeParams,
-  imagenParams,
-  setImagenParams,
+  nanoBananaParams,
+  setNanoBananaParams,
 }) => {
   const handleModelParamsUpdate = (
     updateFn: (prevState: ModelParams) => ModelParams,
@@ -41,10 +39,10 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
     setGenerativeParams((prevState) => updateFn(prevState));
   };
 
-  const handleImagenModelParamsUpdate = (
-    updateFn: (prevState: ImagenModelParams) => ImagenModelParams,
+  const handleNanoBananaModelParamsUpdate = (
+    updateFn: (prevState: ModelParams) => ModelParams,
   ) => {
-    setImagenParams((prevState) => updateFn(prevState));
+    setNanoBananaParams((prevState) => updateFn(prevState));
   };
 
   const getThresholdForCategory = (
@@ -129,9 +127,9 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
         if (checked) {
           // Turn ON JSON
           nextState.generationConfig.responseMimeType = "application/json";
-          nextState.generationConfig.responseSchema = undefined; // Use a default schema
 
           // Turn OFF Function Calling by clearing its related fields
+          nextState.generationConfig.responseSchema = undefined;
           nextState.tools = undefined;
           nextState.toolConfig = undefined;
         } else {
@@ -163,6 +161,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
         if (checked) {
           // Turn ON Google Search Grounding
           nextState.tools = [defaultGoogleSearchTool];
+          nextState.generationConfig.responseMimeType = undefined;
 
           // Turn OFF JSON mode and Function Calling
           nextState.generationConfig.responseMimeType = undefined;
@@ -173,55 +172,8 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
           nextState.tools = undefined;
         }
       }
-      console.log("[RightSidebar] Updated generative params state:", nextState);
       return nextState;
     });
-  };
-
-  const handleImagenModelChange = (
-    event: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
-    const newModel = event.target.value;
-    handleImagenModelParamsUpdate((prev: ImagenModelParams) => ({
-      ...prev,
-      model: newModel,
-    }));
-  };
-  const handleImagenSamplesChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const newCount = parseInt(event.target.value, 10);
-    handleImagenModelParamsUpdate((prev: ImagenModelParams) => ({
-      ...prev,
-      generationConfig: { ...prev.generationConfig, numberOfImages: newCount },
-    }));
-  };
-  const handleImagenNegativePromptChange = (
-    event: React.ChangeEvent<HTMLTextAreaElement>,
-  ) => {
-    const newPrompt = event.target.value || undefined;
-    handleImagenModelParamsUpdate((prev: ImagenModelParams) => ({
-      ...prev,
-      generationConfig: { ...prev.generationConfig, negativePrompt: newPrompt },
-    }));
-  };
-  const handleImagenSafetyChange = (
-    event: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
-    const newLevel = event.target.value as ImagenSafetyFilterLevel;
-    handleImagenModelParamsUpdate((prev: ImagenModelParams) => ({
-      ...prev,
-      safetySettings: { ...prev.safetySettings, safetyFilterLevel: newLevel },
-    }));
-  };
-  const handleImagenPersonChange = (
-    event: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
-    const newLevel = event.target.value as ImagenPersonFilterLevel;
-    handleImagenModelParamsUpdate((prev: ImagenModelParams) => ({
-      ...prev,
-      safetySettings: { ...prev.safetySettings, personFilterLevel: newLevel },
-    }));
   };
 
   // Derive UI state from config
@@ -439,79 +391,69 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
         </>
       )}
 
-      {/* Imagen Settings */}
-      {activeMode === "imagenGen" && (
+      {/* Nano Banana Settings */}
+      {activeMode === "nanobanana" && (
         <div>
-          <h5 className={styles.subSectionTitle}>Imagen Settings</h5>
+          <h5 className={styles.subSectionTitle}>Nano Banana Settings</h5>
           <div className={styles.controlGroup}>
             <label htmlFor="imagen-model-select">Model</label>
             <select
               id="imagen-model-select"
-              value={imagenParams.model}
-              onChange={handleImagenModelChange}
+              value={nanoBananaParams.model}
+              onChange={(e) => handleNanoBananaModelParamsUpdate((prev) => ({ ...prev, model: e.target.value }))}
             >
-              {AVAILABLE_IMAGEN_MODELS.map((modelName) => (
+              {AVAILABLE_NANO_BANANA_MODELS.map((modelName) => (
                 <option key={modelName} value={modelName}>
                   {modelName}
                 </option>
               ))}
             </select>
           </div>
+
           <div className={styles.controlGroup}>
-            <label htmlFor="imagen-samples">Number of Images</label>
-            <input
-              type="number"
-              id="imagen-samples"
-              min="1"
-              max="4"
-              step="1"
-              value={imagenParams.generationConfig?.numberOfImages ?? 1}
-              onChange={handleImagenSamplesChange}
-            />
-          </div>
-          <div className={styles.controlGroup}>
-            <label htmlFor="imagen-negative-prompt">Negative Prompt</label>
-            <textarea
-              id="imagen-negative-prompt"
-              rows={2}
-              value={imagenParams.generationConfig?.negativePrompt || ""}
-              onChange={handleImagenNegativePromptChange}
-              className={styles.textAreaInput}
-            />
-          </div>
-          <div className={styles.controlGroup}>
-            <label htmlFor="imagen-safety-select">Safety Filter Level</label>
-            <select
-              id="imagen-safety-select"
-              value={imagenParams.safetySettings?.safetyFilterLevel || ""}
-              onChange={handleImagenSafetyChange}
-            >
-              <option value="" disabled>
-                Select Level
-              </option>
-              {Object.values(ImagenSafetyFilterLevel).map((level) => (
-                <option key={level} value={level}>
-                  {level.replace(/_/g, " ")}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className={styles.controlGroup}>
-            <label htmlFor="imagen-person-select">Person Filter Level</label>
-            <select
-              id="imagen-person-select"
-              value={imagenParams.safetySettings?.personFilterLevel || ""}
-              onChange={handleImagenPersonChange}
-            >
-              <option value="" disabled>
-                Select Level
-              </option>
-              {Object.values(ImagenPersonFilterLevel).map((level) => (
-                <option key={level} value={level}>
-                  {level.replace(/_/g, " ")}
-                </option>
-              ))}
-            </select>
+            <label>Response Modalities</label>
+            <div style={{ display: 'flex', gap: '10px', marginTop: '5px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <input
+                  type="checkbox"
+                  checked={((nanoBananaParams.generationConfig as any)?.responseModalities || [ResponseModality.TEXT]).includes(ResponseModality.TEXT)}
+                  onChange={(e) => {
+                    handleNanoBananaModelParamsUpdate((prev) => {
+                      const currentModalities = (prev.generationConfig as any)?.responseModalities || [ResponseModality.TEXT];
+                      let newModalities = [...currentModalities];
+                      if (e.target.checked) {
+                        if (!newModalities.includes(ResponseModality.TEXT)) newModalities.push(ResponseModality.TEXT);
+                      } else {
+                        newModalities = newModalities.filter((m) => m !== ResponseModality.TEXT);
+                      }
+                      if (newModalities.length === 0) return prev;
+                      return { ...prev, generationConfig: { ...prev.generationConfig, responseModalities: newModalities } };
+                    });
+                  }}
+                />
+                Text
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <input
+                  type="checkbox"
+                  checked={((nanoBananaParams.generationConfig as any)?.responseModalities || []).includes(ResponseModality.IMAGE)}
+                  onChange={(e) => {
+                    handleNanoBananaModelParamsUpdate((prev) => {
+                      const currentModalities = (prev.generationConfig as any)?.responseModalities || [ResponseModality.TEXT];
+                      let newModalities = [...currentModalities];
+                      if (e.target.checked) {
+                        if (!newModalities.includes(ResponseModality.IMAGE)) newModalities.push(ResponseModality.IMAGE);
+                      } else {
+                        newModalities = newModalities.filter((m) => m !== ResponseModality.IMAGE);
+                      }
+                      if (newModalities.length === 0) return prev;
+                      return { ...prev, generationConfig: { ...prev.generationConfig, responseModalities: newModalities } };
+                    });
+                  }}
+                />
+                Image
+              </label>
+            </div>
           </div>
         </div>
       )}

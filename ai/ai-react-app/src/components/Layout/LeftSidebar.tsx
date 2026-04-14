@@ -40,7 +40,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
   // Define the available modes and their display names
   const modes: { id: AppMode; label: string }[] = [
     { id: "chat", label: "Chat" },
-    { id: "imagenGen", label: "Imagen Generation" },
+    { id: "nanobanana", label: "Nano Banana" },
     { id: "live", label: "Live Conversation" },
   ];
 

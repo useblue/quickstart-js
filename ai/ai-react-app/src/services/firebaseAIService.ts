@@ -9,7 +9,6 @@ import {
   CountTokensResponse,
   GenerativeModel,
   ModelParams,
-  ImagenModelParams,
   FunctionCall,
   GoogleSearchTool,
   BackendType,
@@ -23,10 +22,10 @@ export const AVAILABLE_GENERATIVE_MODELS = [
   "gemini-2.0-flash-exp",
   "gemini-2.5-flash"
 ];
-export const AVAILABLE_IMAGEN_MODELS = [
-  "imagen-4.0-generate-001",
-  "imagen-4.0-fast-generate-001",
-  "imagen-4.0-ultra-generate-001"
+export const AVAILABLE_NANO_BANANA_MODELS = [
+  "gemini-3-pro-image-preview",
+  "gemini-3.1-flash-image-preview",
+  "gemini-2.5-flash-image",
 ];
 export const LIVE_MODELS = new Map<BackendType, string>([
   [BackendType.GOOGLE_AI, 'gemini-2.5-flash-native-audio-preview-09-2025'],
@@ -98,13 +97,7 @@ export const defaultGenerativeParams: Omit<ModelParams, "model"> = {
   // tools, toolConfig, systemInstruction default to undefined
 };
 
-export const defaultImagenParams: Omit<ImagenModelParams, "model"> = {
-  // Model name selected in UI
-  generationConfig: {
-    numberOfImages: 1,
-  },
-  // Default all safety settings to undefined
-};
+
 
 /**
  * Mock function call
