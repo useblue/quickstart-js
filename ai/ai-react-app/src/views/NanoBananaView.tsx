@@ -56,6 +56,7 @@ const ContentDisplay: React.FC<{
 interface NanoBananaViewProps {
   currentParams: ModelParams;
   aiInstance: AI;
+  selectedAspectRatio?: string;
 }
 
 /**
@@ -64,6 +65,7 @@ interface NanoBananaViewProps {
 const NanoBananaView: React.FC<NanoBananaViewProps> = ({
   currentParams,
   aiInstance,
+  selectedAspectRatio,
 }) => {
   const [currentPrompt, setCurrentPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -79,8 +81,12 @@ const NanoBananaView: React.FC<NanoBananaViewProps> = ({
     }
 
     const promptText = currentPrompt.trim();
+    const finalPromptText = selectedAspectRatio
+      ? `${promptText}\nUse aspect ratio ${selectedAspectRatio}`
+      : promptText;
+
     console.log(
-      `[NanoBananaView] Starting generation for prompt: "${promptText}" with params:`,
+      `[NanoBananaView] Starting generation for prompt: "${finalPromptText}" with params:`,
       currentParams,
     );
     setIsLoading(true);
@@ -95,7 +101,7 @@ const NanoBananaView: React.FC<NanoBananaViewProps> = ({
         generationConfig: currentParams.generationConfig,
       });
 
-      const result = await model.generateContent(promptText);
+      const result = await model.generateContent(finalPromptText);
       console.log("[NanoBananaView] Generation successful.", result);
       
       const response = result.response;
@@ -168,6 +174,7 @@ const NanoBananaView: React.FC<NanoBananaViewProps> = ({
           aiInstance={aiInstance}
           activeMode="nanobanana"
           selectedFile={null}
+          selectedAspectRatio={selectedAspectRatio}
         />
       </div>
     </div>

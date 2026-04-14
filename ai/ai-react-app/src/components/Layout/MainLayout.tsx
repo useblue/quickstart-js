@@ -51,6 +51,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
       responseModalities: [ResponseModality.TEXT, ResponseModality.IMAGE],
     },
   });
+  const [selectedAspectRatio, setSelectedAspectRatio] = useState<string | undefined>();
 
   const [usageMetadata, setUsageMetadata] = useState<UsageMetadata | null>(
     null,
@@ -112,7 +113,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
         );
       case "nanobanana":
         return (
-          <NanoBananaView aiInstance={activeAI} currentParams={nanoBananaParams} />
+          <NanoBananaView aiInstance={activeAI} currentParams={nanoBananaParams} selectedAspectRatio={selectedAspectRatio} />
         );
       case "live":
         return (
@@ -155,6 +156,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({
             setGenerativeParams={setGenerativeParams}
             nanoBananaParams={nanoBananaParams}
             setNanoBananaParams={setNanoBananaParams}
+            selectedAspectRatio={selectedAspectRatio}
+            setSelectedAspectRatio={setSelectedAspectRatio}
           />
         </div>
       </div>

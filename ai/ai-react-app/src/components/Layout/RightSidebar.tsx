@@ -23,6 +23,8 @@ interface RightSidebarProps {
   setGenerativeParams: React.Dispatch<React.SetStateAction<ModelParams>>;
   nanoBananaParams: ModelParams;
   setNanoBananaParams: React.Dispatch<React.SetStateAction<ModelParams>>;
+  selectedAspectRatio?: string;
+  setSelectedAspectRatio: (ar?: string) => void;
 }
 
 const RightSidebar: React.FC<RightSidebarProps> = ({
@@ -32,6 +34,8 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   setGenerativeParams,
   nanoBananaParams,
   setNanoBananaParams,
+  selectedAspectRatio,
+  setSelectedAspectRatio,
 }) => {
   const handleModelParamsUpdate = (
     updateFn: (prevState: ModelParams) => ModelParams,
@@ -454,6 +458,22 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                 Image
               </label>
             </div>
+          </div>
+
+          <div className={styles.controlGroup}>
+            <label htmlFor="aspect-ratio-select">Aspect Ratio</label>
+            <select
+              id="aspect-ratio-select"
+              value={selectedAspectRatio || ""}
+              onChange={(e) => setSelectedAspectRatio(e.target.value || undefined)}
+            >
+              <option value="">None</option>
+              {["1:1", "3:2", "2:3", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"].map((ar) => (
+                <option key={ar} value={ar}>
+                  {ar}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       )}
