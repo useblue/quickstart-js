@@ -62,7 +62,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({
     try {
       const backendInstance =
         activeBackendType === BackendType.VERTEX_AI
-          ? new VertexAIBackend()
+          ? activeMode === "nanobanana"
+            ? new VertexAIBackend("global")
+            : new VertexAIBackend()
           : new GoogleAIBackend();
       const aiInstance = getAI(getApp(), { backend: backendInstance });
       setActiveAI(aiInstance);
@@ -77,7 +79,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
       );
       setActiveAI(null);
     }
-  }, [activeBackendType]);
+  }, [activeBackendType, activeMode]);
 
   useEffect(() => {
     setUsageMetadata(null);
