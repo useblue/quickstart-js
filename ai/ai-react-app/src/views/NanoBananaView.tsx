@@ -129,8 +129,8 @@ const NanoBananaView: React.FC<NanoBananaViewProps> = ({
         setFilteredReason(`Generation stopped due to: ${candidate.finishReason}`);
       }
 
-      if (response.promptFeedback?.blockReason) {
-        setFilteredReason(`Prompt blocked due to: ${response.promptFeedback.blockReason}`);
+      if (response.promptFeedback) {
+        setFilteredReason(response.promptFeedback.blockReason ? `Prompt blocked due to: ${response.promptFeedback.blockReason}` : "Prompt blocked due to safety or policy reasons.");
       }
 
       setGeneratedContent(parts);

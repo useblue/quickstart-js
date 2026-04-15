@@ -422,9 +422,9 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
         <div>
           <h5 className={styles.subSectionTitle}>Nano Banana Settings</h5>
           <div className={styles.controlGroup}>
-            <label htmlFor="imagen-model-select">Model</label>
+            <label htmlFor="nanobanana-model-select">Model</label>
             <select
-              id="imagen-model-select"
+              id="nanobanana-model-select"
               value={nanoBananaParams.model}
               onChange={(e) => handleNanoBananaModelParamsUpdate((prev) => ({ ...prev, model: e.target.value }))}
             >
