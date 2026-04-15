@@ -140,7 +140,7 @@ const NanoBananaView: React.FC<NanoBananaViewProps> = ({
       setIsLoading(false);
       setCurrentPrompt("");
     }
-  }, [currentPrompt, isLoading, currentParams, aiInstance]);
+  }, [currentPrompt, isLoading, currentParams, aiInstance, selectedAspectRatio]);
 
   const suggestions = [
     "A photorealistic portrait of a tabby cat wearing sunglasses.",
