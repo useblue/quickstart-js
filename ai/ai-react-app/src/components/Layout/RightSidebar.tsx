@@ -9,12 +9,21 @@ import {
 } from "../../services/firebaseAIService";
 import {
   ModelParams,
+  GenerationConfig,
   HarmCategory,
   HarmBlockThreshold,
   FunctionCallingMode,
   UsageMetadata,
   ResponseModality,
 } from "firebase/ai";
+
+export interface ExtendedGenerationConfig extends GenerationConfig {
+  responseModalities?: ResponseModality[];
+}
+
+export interface ExtendedModelParams extends ModelParams {
+  generationConfig?: ExtendedGenerationConfig;
+}
 
 interface RightSidebarProps {
   usageMetadata: UsageMetadata | null;
@@ -47,6 +56,20 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
     updateFn: (prevState: ModelParams) => ModelParams,
   ) => {
     setNanoBananaParams((prevState) => updateFn(prevState));
+  };
+
+  const handleModalityChange = (modality: ResponseModality, checked: boolean) => {
+    handleNanoBananaModelParamsUpdate((prev) => {
+      const currentModalities = (prev.generationConfig as ExtendedGenerationConfig)?.responseModalities || [ResponseModality.TEXT];
+      let newModalities = [...currentModalities];
+      if (checked) {
+        if (!newModalities.includes(modality)) newModalities.push(modality);
+      } else {
+        newModalities = newModalities.filter((m) => m !== modality);
+      }
+      if (newModalities.length === 0) return prev;
+      return { ...prev, generationConfig: { ...prev.generationConfig, responseModalities: newModalities } };
+    });
   };
 
   const getThresholdForCategory = (
@@ -419,40 +442,16 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
               <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                 <input
                   type="checkbox"
-                  checked={((nanoBananaParams.generationConfig as any)?.responseModalities || [ResponseModality.TEXT]).includes(ResponseModality.TEXT)}
-                  onChange={(e) => {
-                    handleNanoBananaModelParamsUpdate((prev) => {
-                      const currentModalities = (prev.generationConfig as any)?.responseModalities || [ResponseModality.TEXT];
-                      let newModalities = [...currentModalities];
-                      if (e.target.checked) {
-                        if (!newModalities.includes(ResponseModality.TEXT)) newModalities.push(ResponseModality.TEXT);
-                      } else {
-                        newModalities = newModalities.filter((m) => m !== ResponseModality.TEXT);
-                      }
-                      if (newModalities.length === 0) return prev;
-                      return { ...prev, generationConfig: { ...prev.generationConfig, responseModalities: newModalities } };
-                    });
-                  }}
+                  checked={((nanoBananaParams.generationConfig as ExtendedGenerationConfig)?.responseModalities || [ResponseModality.TEXT]).includes(ResponseModality.TEXT)}
+                  onChange={(e) => handleModalityChange(ResponseModality.TEXT, e.target.checked)}
                 />
                 Text
               </label>
               <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                 <input
                   type="checkbox"
-                  checked={((nanoBananaParams.generationConfig as any)?.responseModalities || []).includes(ResponseModality.IMAGE)}
-                  onChange={(e) => {
-                    handleNanoBananaModelParamsUpdate((prev) => {
-                      const currentModalities = (prev.generationConfig as any)?.responseModalities || [ResponseModality.TEXT];
-                      let newModalities = [...currentModalities];
-                      if (e.target.checked) {
-                        if (!newModalities.includes(ResponseModality.IMAGE)) newModalities.push(ResponseModality.IMAGE);
-                      } else {
-                        newModalities = newModalities.filter((m) => m !== ResponseModality.IMAGE);
-                      }
-                      if (newModalities.length === 0) return prev;
-                      return { ...prev, generationConfig: { ...prev.generationConfig, responseModalities: newModalities } };
-                    });
-                  }}
+                  checked={((nanoBananaParams.generationConfig as ExtendedGenerationConfig)?.responseModalities || []).includes(ResponseModality.IMAGE)}
+                  onChange={(e) => handleModalityChange(ResponseModality.IMAGE, e.target.checked)}
                 />
                 Image
               </label>

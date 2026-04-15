@@ -107,6 +107,7 @@ const NanoBananaView: React.FC<NanoBananaViewProps> = ({
       const response = result.response;
       const parts: GeneratedContentPart[] = [];
       
+      // Intentionally only support handling the primary candidate.
       if (response.candidates?.[0].content?.parts) {
         for (const part of response.candidates?.[0].content?.parts) {
           if (part.text) {
@@ -122,6 +123,16 @@ const NanoBananaView: React.FC<NanoBananaViewProps> = ({
           }
         }
       }
+
+      const candidate = response.candidates?.[0];
+      if (candidate && candidate.finishReason && candidate.finishReason !== "STOP") {
+        setFilteredReason(`Generation stopped due to: ${candidate.finishReason}`);
+      }
+
+      if (response.promptFeedback?.blockReason) {
+        setFilteredReason(`Prompt blocked due to: ${response.promptFeedback.blockReason}`);
+      }
+
       setGeneratedContent(parts);
     } catch (err: unknown) {
       console.error("[NanoBananaView] Error during generation:", err);
@@ -153,7 +164,7 @@ const NanoBananaView: React.FC<NanoBananaViewProps> = ({
   };
 
   return (
-    <div className={styles.imagenViewContainer}>
+    <div className={styles.nanoBananaViewContainer}>
       {error && <div className={styles.errorMessage}>{error}</div>}
       <div className={styles.displayArea}>
         <ContentDisplay
