@@ -165,7 +165,6 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
         if (checked) {
           // Turn ON Google Search Grounding
           nextState.tools = [defaultGoogleSearchTool];
-          nextState.generationConfig.responseMimeType = undefined;
 
           // Turn OFF JSON mode and Function Calling
           nextState.generationConfig.responseMimeType = undefined;
