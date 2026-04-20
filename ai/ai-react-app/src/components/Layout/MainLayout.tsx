@@ -3,24 +3,23 @@ import TopBar from "./TopBar";
 import LeftSidebar from "./LeftSidebar";
 import RightSidebar from "./RightSidebar";
 import ChatView from "../../views/ChatView";
-import ImagenView from "../../views/ImagenView";
+import NanoBananaView from "../../views/NanoBananaView";
 import LiveView from "../../views/LiveView";
 import { AppMode } from "../../App";
 import {
   UsageMetadata,
   ModelParams,
-  ImagenModelParams,
   BackendType,
   AI,
   VertexAIBackend,
   GoogleAIBackend,
   getAI,
+  ResponseModality,
 } from "firebase/ai";
 import {
   AVAILABLE_GENERATIVE_MODELS,
-  AVAILABLE_IMAGEN_MODELS,
+  AVAILABLE_NANO_BANANA_MODELS,
   defaultGenerativeParams,
-  defaultImagenParams,
 } from "../../services/firebaseAIService";
 import styles from "./MainLayout.module.css";
 import { getApp } from "firebase/app";
@@ -46,10 +45,13 @@ const MainLayout: React.FC<MainLayoutProps> = ({
     model: AVAILABLE_GENERATIVE_MODELS[0],
     ...defaultGenerativeParams,
   });
-  const [imagenParams, setImagenParams] = useState<ImagenModelParams>({
-    model: AVAILABLE_IMAGEN_MODELS[0],
-    ...defaultImagenParams,
+  const [nanoBananaParams, setNanoBananaParams] = useState<ModelParams>({
+    model: AVAILABLE_NANO_BANANA_MODELS[0],
+    generationConfig: {
+      responseModalities: [ResponseModality.TEXT, ResponseModality.IMAGE],
+    },
   });
+  const [selectedAspectRatio, setSelectedAspectRatio] = useState<string | undefined>();
 
   const [usageMetadata, setUsageMetadata] = useState<UsageMetadata | null>(
     null,
@@ -60,7 +62,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({
     try {
       const backendInstance =
         activeBackendType === BackendType.VERTEX_AI
-          ? new VertexAIBackend()
+          ? activeMode === "nanobanana"
+            ? new VertexAIBackend("global")
+            : new VertexAIBackend()
           : new GoogleAIBackend();
       const aiInstance = getAI(getApp(), { backend: backendInstance });
       setActiveAI(aiInstance);
@@ -75,14 +79,14 @@ const MainLayout: React.FC<MainLayoutProps> = ({
       );
       setActiveAI(null);
     }
-  }, [activeBackendType]);
+  }, [activeBackendType, activeMode]);
 
   useEffect(() => {
     setUsageMetadata(null);
   }, [activeMode]);
 
   useEffect(() => {
-    const validModes: AppMode[] = ["chat", "imagenGen", "live"];
+    const validModes: AppMode[] = ["chat", "nanobanana", "live"];
     if (!validModes.includes(activeMode)) {
       console.warn(`Invalid activeMode "${activeMode}". Resetting to "chat".`);
       setActiveMode("chat");
@@ -109,9 +113,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({
             activeMode={activeMode}
           />
         );
-      case "imagenGen":
+      case "nanobanana":
         return (
-          <ImagenView aiInstance={activeAI} currentParams={imagenParams} />
+          <NanoBananaView aiInstance={activeAI} currentParams={nanoBananaParams} selectedAspectRatio={selectedAspectRatio} />
         );
       case "live":
         return (
@@ -152,8 +156,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({
             activeMode={activeMode}
             generativeParams={generativeParams}
             setGenerativeParams={setGenerativeParams}
-            imagenParams={imagenParams}
-            setImagenParams={setImagenParams}
+            nanoBananaParams={nanoBananaParams}
+            setNanoBananaParams={setNanoBananaParams}
+            selectedAspectRatio={selectedAspectRatio}
+            setSelectedAspectRatio={setSelectedAspectRatio}
           />
         </div>
       </div>

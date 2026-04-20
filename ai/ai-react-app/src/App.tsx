@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import MainLayout from "./components/Layout/MainLayout";
 
 // Defines the primary modes or views available in the application.
-export type AppMode = "chat" | "imagenGen" | "live";
+export type AppMode = "chat" | "nanobanana" | "live";
 
 function App() {
-  // State to manage which main view ('chat' or 'imagenGen') is currently active.
+  // State to manage which main view ('chat' or 'nanobanana') is currently active.
   const [activeMode, setActiveMode] = useState<AppMode>("chat");
 
   useEffect(() => {

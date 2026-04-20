@@ -1,4 +1,4 @@
-.imagenViewContainer {
+.nanoBananaViewContainer {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -102,4 +102,21 @@
   height: auto;
   display: block;
   border-radius: 2px;
+}
+
+.contentList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.partWrapper {
+  width: 100%;
+}
+
+.generatedText {
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  line-height: 1.5;
 }

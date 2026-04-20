@@ -6,7 +6,6 @@ import {
   CountTokensResponse,
   Part,
   getGenerativeModel,
-  ImagenModelParams,
 } from "firebase/ai";
 import { fileToGenerativePart } from "../../utils/fileUtils";
 import { AppMode } from "../../App";
@@ -23,8 +22,8 @@ interface PromptInputProps {
   activeMode: AppMode;
   aiInstance: AI;
   currentParams?: ModelParams;
-  currentImagenParams?: ImagenModelParams;
   selectedFile: File | null;
+  selectedAspectRatio?: string;
 }
 
 const PromptInput: React.FC<PromptInputProps> = ({
@@ -39,6 +38,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
   aiInstance,
   currentParams,
   selectedFile,
+  selectedAspectRatio,
 }) => {
   const [tokenCount, setTokenCount] = useState<CountTokensResponse | null>(
     null,
@@ -55,11 +55,15 @@ const PromptInput: React.FC<PromptInputProps> = ({
     setTokenCountError(null);
 
     const currentPromptText = prompt.trim();
+    let textToCount = currentPromptText;
+    if (selectedAspectRatio) {
+      textToCount += `\nUse aspect ratio ${selectedAspectRatio}`;
+    }
     const parts: Part[] = [];
 
     // Add text part if present
-    if (currentPromptText) {
-      parts.push({ text: currentPromptText });
+    if (textToCount) {
+      parts.push({ text: textToCount });
     }
 
     // Add file part if present
@@ -137,15 +141,22 @@ const PromptInput: React.FC<PromptInputProps> = ({
 
       {/* Main Input Area */}
       <div className={styles.inputArea}>
-        <textarea
-          className={styles.promptTextarea}
-          value={prompt}
-          onChange={(e) => onPromptChange(e.target.value)}
-          placeholder={placeholder}
-          disabled={isLoading || isCountingTokens} // Disable if main loading OR counting
-          rows={3}
-          aria-label="Prompt input"
-        />
+        <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+          <textarea
+            className={styles.promptTextarea}
+            value={prompt}
+            onChange={(e) => onPromptChange(e.target.value)}
+            placeholder={placeholder}
+            disabled={isLoading || isCountingTokens} // Disable if main loading OR counting
+            rows={3}
+            aria-label="Prompt input"
+          />
+          {selectedAspectRatio && (
+            <div style={{ color: '#aaa', fontSize: '0.9em', marginTop: '5px', width: '100%' }}>
+              Use aspect ratio {selectedAspectRatio}
+            </div>
+          )}
+        </div>
         <button
           className={styles.runButton}
           onClick={onSubmit}
